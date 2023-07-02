@@ -1,20 +1,23 @@
-i#!/usr/bin/python3
-"""lists the 10 most recent commits on a given GitHub repository.
+#!/usr/bin/python3
 """
-import sys
+100-github_commits.py
+"""
+
 import requests
+import sys
 
 
 if __name__ == "__main__":
-    url = "https://api.github.com/repos/{}/{}/commits".format(
-        sys.argv[2], sys.argv[1])
-
-    r = requests.get(url)
-    commits = r.json()
-    try:
-        for i in range(10):
-            print("{}: {}".format(
-                commits[i].get("sha"),
-                commits[i].get("commit").get("author").get("name")))
-    except IndexError:
-        pass
+    repo = sys.argv[1]
+    owner = sys.argv[2]
+    url = f"https://api.github.com/repos/{owner}/{repo}/commits?per_page=10"
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28"
+    }
+    response = requests.get(url, headers=headers)
+    resp = response.json()
+    for commit in resp:
+        sha = commit.get("sha")
+        author = commit.get("commit").get("author").get("name")
+        print(f"{sha}: {author}")
